@@ -51,7 +51,7 @@ namespace FunctionApp1
             }
             catch (Exception ex)
             {
-                return req.CreateResponse(HttpStatusCode.InternalServerError, ex);
+                return req.CreateResponse(HttpStatusCode.InternalServerError);
             }
         }
     }
