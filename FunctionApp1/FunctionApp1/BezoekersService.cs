@@ -33,10 +33,16 @@ namespace FunctionApp1
 
                 using (SqlConnection connection = new SqlConnection(CONNECTIONSTRING))
                 {
+                    //Openen verbinding met de SQL Database
                     connection.Open();
+
+                    //nieuwe SQL Commando aanmaken
                     using (SqlCommand command = new SqlCommand())
                     {
+                        //connectie doorgeven zodat command object weet via welke connectie deze verbinding moet maken
                         command.Connection = connection;
+
+                        //SQL statement opzetten
                         string sql = "SELECT DISTINCT DagVanDeWeek FROM Bezoekers";
                         command.CommandText = sql;
 
@@ -44,6 +50,41 @@ namespace FunctionApp1
                         while (reader.Read())
                         {
                             days.Add(reader["DagVanDeWeek"].ToString());
+                        }
+                    }
+                }
+                return req.CreateResponse(HttpStatusCode.OK, days);
+            }
+            catch (Exception ex)
+            {
+                return req.CreateResponse(HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [FunctionName("GetBezoekersOpDag")]
+        public static async Task<HttpResponseMessage> GetBezoekersOpDag([HttpTrigger(AuthorizationLevel.Anonymous, "get" ,Route = "visitors/{day}")]HttpResponseMessage req, string day, TraceWriter log)
+        {
+            try
+            {
+                List<Visit> days = new List<Visit>();
+                using (SqlConnection connection = new SqlConnection(CONNECTIONSTRING))
+                {
+                    connection.Open();
+
+                    using (SqlCommand command = new SqlCommand())
+                    {
+                        command.Connection = connection;
+                        string sql = "SELECT * FROM Bezoekers WHERE DagVanDeWeek = @day";
+                        command.CommandText = sql;
+                        command.Parameters.AddWithValue("@day", day);
+                        SqlDataReader reader = command.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            Visit v = new Visit();
+                            v.AantalBezoekers = int.Parse(reader["AantalBezoekers"].ToString());
+                            v.Dag = day;
+                            v.Tijdstip = int.Parse(reader["TijdstipDag"].ToString());
+                            days.Add(v);
                         }
                     }
                 }
