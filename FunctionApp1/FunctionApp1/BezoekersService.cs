@@ -13,7 +13,7 @@ namespace FunctionApp1
 {
     public static class BezoekersService
     {
-        private static string CONNECTIONSTRING = Environment.GetEnvironmentVariable("ConnectionsString");
+        private static string CONNECTIONSTRING = Environment.GetEnvironmentVariable("ConnectionString");
 
         [FunctionName("BezoekersService")]
         public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "HttpTriggerCSharp/BezoekersService/{name}")]HttpRequestMessage req, string name, TraceWriter log)
@@ -51,7 +51,7 @@ namespace FunctionApp1
             }
             catch (Exception ex)
             {
-                return req.CreateResponse(HttpStatusCode.InternalServerError);
+                return req.CreateResponse(HttpStatusCode.InternalServerError, ex);
             }
         }
     }
